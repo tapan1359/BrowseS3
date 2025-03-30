@@ -1,70 +1,87 @@
-name: Release
+name: Build and Release
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
+    tags:
+      - 'v*'
 
 permissions:
   contents: write
   packages: write
 
 jobs:
-  release:
+  build:
+    if: github.ref == 'refs/heads/main'  # Only run on main branch pushes
     runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-
     steps:
       - uses: actions/checkout@v3
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-
       - name: Install dependencies
         run: npm ci
-
       - name: Build
         run: npm run build
-
       - name: Package
         run: npm run package
-
       - name: Make
         run: npm run make
-
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: ${{ matrix.os }}-packages
           path: out/make/
           retention-days: 5
           if-no-files-found: error
 
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')  # Only run on version tags
+    needs: build  # Wait for build to complete
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
       - name: Create Release
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}
           release_name: Release ${{ github.ref_name }}
           draft: false
           prerelease: false
+          body: |
+            Release ${{ github.ref_name }}
+            
+            Automated release for version ${{ github.ref_name }}
+            
+            ## Downloads
+            - Windows: .exe installer
+            - macOS: .zip archive
+            - Linux: .deb and .rpm packages
 
       - name: Upload Release Assets
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./out/make/**/*.exe,./out/make/**/*.dmg,./out/make/**/*.zip,./out/make/**/*.deb,./out/make/**/*.rpm
-          asset_name: ${{ matrix.os }}-packages
-          asset_content_type: application/octet-stream 
+          files: |
+            artifacts/**/*.exe
+            artifacts/**/*.dmg
+            artifacts/**/*.zip
+            artifacts/**/*.deb
+            artifacts/**/*.rpm
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
