@@ -2,15 +2,18 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './',
-  root: path.join(__dirname, 'src'),
+  base: process.env.NODE_ENV === 'production' ? './' : '/',
   build: {
-    outDir: path.join(__dirname, 'dist'),
+    outDir: 'dist',
+    assetsDir: 'assets',
     emptyOutDir: true
   },
-  css: {
-    postcss: './postcss.config.js'
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src')
+    }
   }
 }); 

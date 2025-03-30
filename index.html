@@ -1,33 +1,12 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Browse S3</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>S3 Browser</h2>
-            </div>
-            <div class="bucket-list">
-                <h3>Buckets</h3>
-                <div id="buckets"></div>
-            </div>
-        </div>
-        <div class="main-content">
-            <div class="header">
-                <h1>Browse S3</h1>
-                <div class="actions">
-                    <button id="refreshBtn">Refresh</button>
-                    <button id="uploadBtn">Upload</button>
-                </div>
-            </div>
-            <div class="content">
-                <div id="fileList"></div>
-            </div>
-        </div>
-    </div>
-    <script src="renderer.js"></script>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BrowseS3</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.jsx"></script>
+  </body>
 </html> 

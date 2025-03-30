@@ -56,11 +56,14 @@ function createWindow() {
     }
   });
 
-  // Load the app
-  if (isDev) {
+  // Determine the URL to load based on the environment
+  if (process.env.NODE_ENV === 'development') {
+    // In development, load from Vite dev server
     mainWindow.loadURL('http://localhost:5173');
+    // Open DevTools
     mainWindow.webContents.openDevTools();
   } else {
+    // In production, load from built files
     mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
   }
 
