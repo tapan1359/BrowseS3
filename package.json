@@ -1,7 +1,7 @@
 {
   "name": "s3-browser",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": ".vite/build/main.js",
   "description": "A simple Electron app to browse S3 buckets",
   "license": "MIT",
