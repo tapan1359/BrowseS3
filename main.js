@@ -1,20 +1,25 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
-const isDev = process.env.NODE_ENV === 'development';
-const fs = require('fs');
+const { exec } = require('child_process');
 const os = require('os');
+const fs = require('fs');
 const { 
   S3Client, 
   ListBucketsCommand, 
   ListObjectsCommand,
   GetObjectCommand,
-  PutObjectCommand
+  PutObjectCommand,
+  DeleteObjectCommand
 } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { fromIni } = require('@aws-sdk/credential-providers');
-const { dialog } = require('electron');
+const { fromNodeProviderChain } = require('@aws-sdk/credential-providers');
 
 let s3Client = null;
+let mainWindow = null;
+
+// Handle development server URL
+const isDev = process.env.NODE_ENV === 'development';
+const devServerUrl = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173';
 
 // Function to read AWS profiles
 function getAWSProfiles() {
@@ -46,24 +51,21 @@ function getAWSProfiles() {
 }
 
 function createWindow() {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
     }
   });
 
-  // Determine the URL to load based on the environment
-  if (process.env.NODE_ENV === 'development') {
-    // In development, load from Vite dev server
-    mainWindow.loadURL('http://localhost:5173');
-    // Open DevTools
+  // Load the app
+  if (isDev) {
+    mainWindow.loadURL(devServerUrl);
     mainWindow.webContents.openDevTools();
   } else {
-    // In production, load from built files
     mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
   }
 
@@ -83,7 +85,7 @@ ipcMain.handle('get-aws-credentials', async (event, profile) => {
     // Create S3 client with credentials from the specified profile
     s3Client = new S3Client({
       region: 'us-east-1',
-      credentials: fromIni({ profile })
+      credentials: fromNodeProviderChain({ profile })
     });
     
     return true;
@@ -98,10 +100,10 @@ ipcMain.handle('aws-sso-signin', async (event, profile) => {
   try {
     console.log('Starting AWS SSO sign-in for profile:', profile);
     
-    // For SSO profiles, the fromIni credential provider will handle the SSO flow
+    // For SSO profiles, the fromNodeProviderChain credential provider will handle the SSO flow
     s3Client = new S3Client({
       region: 'us-east-1',
-      credentials: fromIni({ profile })
+      credentials: fromNodeProviderChain({ profile })
     });
     
     // Test the credentials by making a simple API call

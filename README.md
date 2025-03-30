@@ -1,38 +1,30 @@
-# BrowseS3
+# S3 Browser
 
-A modern, feature-rich S3 file browser with AWS SSO support. Built with Electron, React, and Tailwind CSS.
-
-![BrowseS3 Screenshot](screenshot.png)
+A modern desktop application for browsing and managing AWS S3 buckets with AWS SSO support.
 
 ## Features
 
-- 🔐 AWS SSO Support
-- 📂 Hierarchical folder navigation
-- 🔍 File search within folders
-- 👀 File preview support for:
-  - Text files
-  - Code files with syntax highlighting
-  - Images
-  - PDFs
-- 📤 Upload files and folders
-- 📥 Download files and folders
-- 🎨 Modern, responsive UI with dark theme
-- ↔️ Resizable panels
-- 🔄 Auto-refresh
-- 🗂️ Breadcrumb navigation
+- Browse S3 buckets and folders
+- Upload and download files
+- Preview various file types (images, PDFs, text files, code)
+- AWS SSO support
+- Search functionality
+- Pagination for large directories
+- Modern UI with Tailwind CSS
 
-## Installation
+## Prerequisites
 
-### Download Pre-built Binaries
+- Node.js (v14 or later)
+- npm (v6 or later)
+- AWS CLI configured with profiles
+- AWS SSO configured (if using SSO profiles)
 
-Download the latest release for your platform from the [Releases](https://github.com/yourusername/browse-s3/releases) page.
-
-### Build from Source
+## Development
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/browse-s3.git
-cd browse-s3
+git clone <repository-url>
+cd s3-browser
 ```
 
 2. Install dependencies:
@@ -40,49 +32,51 @@ cd browse-s3
 npm install
 ```
 
-3. Run in development mode:
+3. Start the development server:
 ```bash
-npm run electron:dev
+npm start
 ```
 
-4. Build for production:
+This will start both the Vite development server and the Electron application.
+
+## Building for Production
+
+1. Build the application:
 ```bash
-npm run electron:build
+npm run build
 ```
 
-The built application will be available in the `dist_electron` directory.
+2. Package the application:
+```bash
+npm run package
+```
 
-## AWS Configuration
+This will create an unpacked version of the application in the `out` directory.
 
-1. **Standard AWS Profiles**
-   - Configure your AWS credentials in `~/.aws/credentials`
-   - Configure your AWS config in `~/.aws/config`
+3. Create distributable packages:
+```bash
+npm run make
+```
 
-2. **AWS SSO Profiles**
-   - Configure your SSO profiles in `~/.aws/config`:
-   ```ini
-   [profile my-sso-profile]
-   sso_start_url = https://my-sso-portal.awsapps.com/start
-   sso_region = us-east-1
-   sso_account_id = 123456789012
-   sso_role_name = MyRole
-   region = us-west-2
-   ```
+This will create platform-specific packages in the `out/make` directory:
+- Windows: Squirrel installer
+- macOS: ZIP archive
+- Linux: DEB and RPM packages
 
-## Development
+## Configuration
 
-### Project Structure
+### AWS Credentials
 
-- `main.js` - Electron main process
-- `preload.js` - Electron preload script
-- `src/App.jsx` - Main React component
-- `src/index.jsx` - React entry point
+The application uses AWS credentials from your local AWS CLI configuration. Make sure you have:
 
-### Available Scripts
+1. AWS CLI installed and configured
+2. Credentials file at `~/.aws/credentials`
+3. SSO configuration in `~/.aws/config` (if using SSO)
 
-- `npm run electron:dev` - Run in development mode
-- `npm run electron:build` - Build for production
-- `npm run electron:preview` - Preview production build
+### Development Environment
+
+The application uses the following environment variables:
+- `NODE_ENV`: Set to 'development' during development and 'production' during packaging
 
 ## Contributing
 
@@ -94,11 +88,4 @@ The built application will be available in the `dist_electron` directory.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- [Electron](https://www.electronjs.org/)
-- [React](https://reactjs.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [AWS SDK for JavaScript](https://aws.amazon.com/sdk-for-javascript/)
+This project is licensed under the MIT License - see the LICENSE file for details.
