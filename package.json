@@ -4,6 +4,11 @@
   "version": "0.1.0",
   "main": ".vite/build/main.js",
   "description": "A simple Electron app to browse S3 buckets",
+  "license": "MIT",
+  "author": {
+    "name": "Tapane Parmar",
+    "email": "tapan1359@gmail.com"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
