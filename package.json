@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "main": ".vite/build/main.js",
+  "description": "A simple Electron app to browse S3 buckets",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
