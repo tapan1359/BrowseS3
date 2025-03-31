@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -20,18 +24,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build and Package
-        run: npm run make
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            out/**/*.exe
-            out/**/*.dmg
-            out/**/*.deb
-            out/**/*.rpm
-            out/**/*.zip
-            out/**/*.AppImage
+      - name: Build and Publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run publish 
