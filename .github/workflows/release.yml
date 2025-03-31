@@ -5,19 +5,12 @@ on:
     tags:
       - 'v*'
 
-permissions:
-  contents: write
-  packages: write
-
 jobs:
   release:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -27,44 +20,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
-
-      - name: Package
-        run: npm run package
-
-      - name: Make
+      - name: Build and Package
         run: npm run make
 
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          body: |
-            Release ${{ github.ref_name }}
-            
-            Automated release for version ${{ github.ref_name }}
-            
-            ## Downloads
-            - Windows: .exe installer
-            - macOS: .zip archive
-            - Linux: .deb and .rpm packages
-
-      - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            out/make/**/*.exe
-            out/make/**/*.dmg
-            out/make/**/*.zip
-            out/make/**/*.deb
-            out/make/**/*.rpm
-          fail_on_unmatched_files: true
+            out/**/*.exe
+            out/**/*.dmg
+            out/**/*.deb
+            out/**/*.rpm
+            out/**/*.zip
+            out/**/*.AppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
