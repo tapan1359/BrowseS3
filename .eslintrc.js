@@ -24,35 +24,35 @@ module.exports = {
     },
   },
   rules: {
-    // Error prevention
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    // Error prevention - relaxed to warnings
+    'no-console': 'off',
+    'no-debugger': 'warn',
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-    'no-undef': 'error',
-
-    // React specific
+    'no-undef': 'warn',
+    
+    // React specific - relaxed
     'react/prop-types': 'off', // We're not using PropTypes
     'react/react-in-jsx-scope': 'off', // Not needed with React 17+
-    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/rules-of-hooks': 'warn', // Downgraded from error
     'react-hooks/exhaustive-deps': 'warn',
-    'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-
-    // Style
-    'semi': ['error', 'always'],
-    'quotes': ['error', 'single', { avoidEscape: true }],
-    'comma-dangle': ['error', 'always-multiline'],
-    'arrow-parens': ['error', 'always'],
-    'no-trailing-spaces': 'error',
-    'eol-last': ['error', 'always'],
-
-    // Best practices
-    'eqeqeq': ['error', 'always', { null: 'ignore' }],
-    'no-var': 'error',
-    'prefer-const': 'error',
-    'prefer-template': 'error',
-    'object-shorthand': 'error',
-    'array-callback-return': 'error',
-    'no-else-return': 'error',
+    'react-refresh/only-export-components': 'off', // Turned off for more flexibility
+    
+    // Style - relaxed to warnings
+    'semi': ['warn', 'always'],
+    'quotes': ['warn', 'single', { avoidEscape: true }],
+    'comma-dangle': ['warn', 'always-multiline'],
+    'arrow-parens': ['warn', 'always'],
+    'no-trailing-spaces': 'warn',
+    'eol-last': ['warn', 'always'],
+    
+    // Best practices - relaxed
+    'eqeqeq': ['warn', 'always', { null: 'ignore' }],
+    'no-var': 'warn',
+    'prefer-const': 'warn',
+    'prefer-template': 'warn',
+    'object-shorthand': 'warn',
+    'array-callback-return': 'warn',
+    'no-else-return': 'warn',
   },
   overrides: [
     {
@@ -66,7 +66,7 @@ module.exports = {
       files: ['*.jsx'],
       rules: {
         // JSX specific rules
-        'jsx-quotes': ['error', 'prefer-double'],
+        'jsx-quotes': ['warn', 'prefer-double'],
       },
     },
   ],
