@@ -31,6 +31,9 @@ let mainWindow = null;
 const isDev = process.env.NODE_ENV === 'development';
 const devServerUrl = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173';
 
+// In production, this file will be processed by Vite and placed in .vite/build/
+// In development, this file is used directly
+
 // Function to read AWS profiles
 function getAWSProfiles() {
   try {
@@ -77,7 +80,10 @@ function createWindow() {
     mainWindow.loadURL(devServerUrl);
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
+    // In production, we need to use a relative path from the .vite/build directory
+    const indexPath = path.join(__dirname, '..', '..', 'dist', 'index.html');
+    console.log('Loading production path:', indexPath);
+    mainWindow.loadFile(indexPath);
   }
 
   // Send AWS profiles to renderer process

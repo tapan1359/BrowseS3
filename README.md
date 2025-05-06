@@ -74,6 +74,27 @@ This will create platform-specific packages in the `out/make` directory:
 npm run publish
 ```
 
+## Project Structure
+
+This project uses Electron with Vite and React. The key files are:
+
+- `main.js`: The Electron main process file
+- `preload.js`: Preload script for secure IPC communication
+- `src/index.jsx`: React entry point
+- `src/App.jsx`: Main React component
+
+For development, we use:
+- `main.js` directly with the Vite dev server
+- React hot module replacement via Vite
+
+For production, Electron Forge with the Vite plugin:
+- Builds the React app to `dist/`
+- Processes main.js and preload.js to `.vite/build/`
+- Packages everything into an Electron app
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details
 ## Configuration
 
 ### AWS Credentials
@@ -83,7 +104,3 @@ The application uses AWS credentials from your local AWS CLI configuration. Make
 1. AWS CLI installed and configured
 2. Credentials file at `~/.aws/credentials`
 3. SSO configuration in `~/.aws/config` (if using SSO)
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details

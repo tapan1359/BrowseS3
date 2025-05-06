@@ -18,7 +18,7 @@ npx wait-on http://localhost:5173
 
 # Start Electron
 echo "Starting Electron app..."
-electron .
+electron main.js
 
 # Clean up Vite process when Electron exits
 kill $VITE_PID
