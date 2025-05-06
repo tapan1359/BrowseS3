@@ -27,12 +27,9 @@ if (process.env.NODE_ENV === 'development') {
 let s3Client = null;
 let mainWindow = null;
 
-// Handle development server URL
+// Get the correct entry point based on environment
 const isDev = process.env.NODE_ENV === 'development';
 const devServerUrl = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173';
-
-// Get the correct entry point based on environment
-const entryPath = isDev ? process.env.ELECTRON_ENTRY || 'main.js' : __filename;
 
 // Function to read AWS profiles
 function getAWSProfiles() {
@@ -70,16 +67,17 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(path.dirname(entryPath), 'preload.js'),
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
 
   // Load the app
   if (isDev) {
+    console.log('Loading development server URL:', devServerUrl);
     mainWindow.loadURL(devServerUrl);
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(path.dirname(entryPath), '..', 'renderer', 'index.html'));
+    mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
   }
 
   // Send AWS profiles to renderer process

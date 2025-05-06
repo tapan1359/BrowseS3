@@ -36,7 +36,11 @@ npm install
 
 3. Start the development server:
 ```bash
-npm start
+# Start both React and Electron in development mode
+npm run start
+
+# Alternatively, use the shell script
+./run-app.sh
 ```
 
 This will start both the Vite development server and the Electron application.
@@ -64,6 +68,11 @@ This will create platform-specific packages in the `out/make` directory:
 - Windows: Squirrel installer
 - macOS: ZIP archive
 - Linux: DEB and RPM packages
+
+4. Publish a release (requires GitHub token):
+```bash
+npm run publish
+```
 
 ## Configuration
 

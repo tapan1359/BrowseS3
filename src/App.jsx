@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar';
 import FileExplorer from './components/FileExplorer';
 import FilePreview from './components/FilePreview';
 import FileEditor from './components/FileEditor';
+import CodeEditor from './components/CodeEditor';
 
 function App() {
   const [buckets, setBuckets] = useState([]);
@@ -431,12 +432,21 @@ function App() {
 
           {selectedFile ? (
             isEditing ? (
-              <FileEditor
-                file={selectedFile}
-                content={fileContent}
-                onSave={handleSaveFile}
-                onCancel={handleCancelEdit}
-              />
+              fileContent.type === 'code' ? (
+                <CodeEditor
+                  file={selectedFile}
+                  content={fileContent}
+                  onSave={handleSaveFile}
+                  onCancel={handleCancelEdit}
+                />
+              ) : (
+                <FileEditor
+                  file={selectedFile}
+                  content={fileContent}
+                  onSave={handleSaveFile}
+                  onCancel={handleCancelEdit}
+                />
+              )
             ) : (
               <FilePreview
                 file={selectedFile}

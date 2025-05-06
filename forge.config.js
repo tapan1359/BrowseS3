@@ -1,15 +1,29 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+const path = require('path');
 
 module.exports = {
   packagerConfig: {
     asar: true,
+    dir: __dirname,
+    out: path.join(__dirname, 'out'),
+    executableName: 's3-browser',
+    ignore: [
+      /^\/src\//,
+      /^\/\.git\//,
+      /^\/\.github\//,
+      /^\/\.vscode\//,
+      /^\/node_modules\//,
+      /^\/\.idea\//,
+    ],
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        name: 's3-browser'
+      },
     },
     {
       name: '@electron-forge/maker-zip',
