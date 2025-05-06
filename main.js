@@ -3,16 +3,26 @@ const path = require('path');
 const { exec } = require('child_process');
 const os = require('os');
 const fs = require('fs');
-const { 
-  S3Client, 
-  ListBucketsCommand, 
+const {
+  S3Client,
+  ListBucketsCommand,
   ListObjectsCommand,
   GetObjectCommand,
   PutObjectCommand,
-  DeleteObjectCommand
+  DeleteObjectCommand,
 } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { fromNodeProviderChain } = require('@aws-sdk/credential-providers');
+
+// Enable auto-reload in development
+if (process.env.NODE_ENV === 'development') {
+  try {
+    require('electron-reloader')(module, {
+      debug: true,
+      watchRenderer: true,
+    });
+  } catch (_) { console.log('Error'); }
+}
 
 let s3Client = null;
 let mainWindow = null;
@@ -29,23 +39,23 @@ function getAWSProfiles() {
   try {
     const credentialsPath = path.join(os.homedir(), '.aws', 'credentials');
     const configPath = path.join(os.homedir(), '.aws', 'config');
-    
+
     const profiles = new Set(['default']);
-    
+
     // Read credentials file
     if (fs.existsSync(credentialsPath)) {
       const credentials = fs.readFileSync(credentialsPath, 'utf8');
-      const credentialProfiles = credentials.match(/\[(.*?)\]/g)?.map(profile => profile.slice(1, -1)) || [];
-      credentialProfiles.forEach(profile => profiles.add(profile));
+      const credentialProfiles = credentials.match(/\[(.*?)\]/g)?.map((profile) => profile.slice(1, -1)) || [];
+      credentialProfiles.forEach((profile) => profiles.add(profile));
     }
-    
+
     // Read config file for SSO profiles
     if (fs.existsSync(configPath)) {
       const config = fs.readFileSync(configPath, 'utf8');
-      const ssoProfiles = config.match(/\[profile (.*?)\]/g)?.map(profile => profile.slice(9, -1)) || [];
-      ssoProfiles.forEach(profile => profiles.add(profile));
+      const ssoProfiles = config.match(/\[profile (.*?)\]/g)?.map((profile) => profile.slice(9, -1)) || [];
+      ssoProfiles.forEach((profile) => profiles.add(profile));
     }
-    
+
     return Array.from(profiles);
   } catch (error) {
     console.error('Error reading AWS profiles:', error);
@@ -60,8 +70,8 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(path.dirname(entryPath), 'preload.js')
-    }
+      preload: path.join(path.dirname(entryPath), 'preload.js'),
+    },
   });
 
   // Load the app
@@ -84,13 +94,13 @@ function createWindow() {
 ipcMain.handle('get-aws-credentials', async (event, profile) => {
   try {
     console.log('Initializing AWS with profile:', profile);
-    
+
     // Create S3 client with credentials from the specified profile
     s3Client = new S3Client({
       region: 'us-east-1',
-      credentials: fromNodeProviderChain({ profile })
+      credentials: fromNodeProviderChain({ profile }),
     });
-    
+
     return true;
   } catch (error) {
     console.error('Error getting AWS credentials:', error);
@@ -102,13 +112,13 @@ ipcMain.handle('get-aws-credentials', async (event, profile) => {
 ipcMain.handle('aws-sso-signin', async (event, profile) => {
   try {
     console.log('Starting AWS SSO sign-in for profile:', profile);
-    
+
     // For SSO profiles, the fromNodeProviderChain credential provider will handle the SSO flow
     s3Client = new S3Client({
       region: 'us-east-1',
-      credentials: fromNodeProviderChain({ profile })
+      credentials: fromNodeProviderChain({ profile }),
     });
-    
+
     // Test the credentials by making a simple API call
     await s3Client.send(new ListBucketsCommand({}));
     return true;
@@ -157,15 +167,15 @@ ipcMain.handle('get-signed-url', async (event, bucketName, key) => {
     if (!s3Client) {
       throw new Error('AWS client not initialized');
     }
-    
+
     const command = new GetObjectCommand({
       Bucket: bucketName,
-      Key: key
+      Key: key,
     });
 
     // Generate a signed URL that expires in 1 hour
     const signedUrl = await getSignedUrl(s3Client, command, {
-      expiresIn: 3600
+      expiresIn: 3600,
     });
 
     return signedUrl;
@@ -186,13 +196,34 @@ ipcMain.handle('upload-file', async (event, { bucket, key, filePath }) => {
     const command = new PutObjectCommand({
       Bucket: bucket,
       Key: key,
-      Body: fileStream
+      Body: fileStream,
     });
 
     await s3Client.send(command);
     return true;
   } catch (error) {
     console.error('Error uploading file:', error);
+    throw error;
+  }
+});
+
+// Add save file content handler
+ipcMain.handle('save-file-content', async (event, { bucket, key, content }) => {
+  try {
+    if (!s3Client) {
+      throw new Error('AWS not initialized');
+    }
+
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: content,
+    });
+
+    await s3Client.send(command);
+    return true;
+  } catch (error) {
+    console.error('Error saving file content:', error);
     throw error;
   }
 });
@@ -208,7 +239,7 @@ ipcMain.handle('download-folder', async (event, { bucket, prefix }) => {
     const { filePaths } = await dialog.showOpenDialog({
       properties: ['openDirectory'],
       title: 'Select Download Location',
-      buttonLabel: 'Select Folder'
+      buttonLabel: 'Select Folder',
     });
 
     if (!filePaths || filePaths.length === 0) {
@@ -220,7 +251,7 @@ ipcMain.handle('download-folder', async (event, { bucket, prefix }) => {
     // List all objects in the folder
     const command = new ListObjectsCommand({
       Bucket: bucket,
-      Prefix: prefix
+      Prefix: prefix,
     });
 
     const { Contents } = await s3Client.send(command);
@@ -232,14 +263,14 @@ ipcMain.handle('download-folder', async (event, { bucket, prefix }) => {
     for (const file of Contents) {
       const getCommand = new GetObjectCommand({
         Bucket: bucket,
-        Key: file.Key
+        Key: file.Key,
       });
 
       const { Body } = await s3Client.send(getCommand);
-      
+
       // Create the full path for the file
-      const relativePath = file.Key.startsWith(prefix) 
-        ? file.Key.slice(prefix.length) 
+      const relativePath = file.Key.startsWith(prefix)
+        ? file.Key.slice(prefix.length)
         : file.Key;
       const fullPath = path.join(downloadPath, relativePath);
 
@@ -273,4 +304,4 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit();
-}); 
+});

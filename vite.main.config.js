@@ -5,7 +5,7 @@ module.exports = defineConfig({
     outDir: '.vite/build',
     emptyOutDir: true,
     rollupOptions: {
-      external: ['electron']
-    }
-  }
-}); 
+      external: ['electron'],
+    },
+  },
+});

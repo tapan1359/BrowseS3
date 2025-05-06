@@ -2,20 +2,22 @@
 
 A modern desktop application for browsing and managing AWS S3 buckets with AWS SSO support.
 
+
 ## Features
 
+- Modern, sleek UI with dark mode
 - Browse S3 buckets and folders
 - Upload and download files
-- Preview various file types (images, PDFs, text files, code)
+- Preview various file types (images, PDFs, text files, code with syntax highlighting)
 - AWS SSO support
 - Search functionality
-- Pagination for large directories
-- Modern UI with Tailwind CSS
+- Responsive layout with resizable panels
+- Built with React, Tailwind CSS, and Electron
 
 ## Prerequisites
 
-- Node.js (v14 or later)
-- npm (v6 or later)
+- Node.js (v16 or later)
+- npm (v8 or later)
 - AWS CLI configured with profiles
 - AWS SSO configured (if using SSO profiles)
 
@@ -73,19 +75,6 @@ The application uses AWS credentials from your local AWS CLI configuration. Make
 2. Credentials file at `~/.aws/credentials`
 3. SSO configuration in `~/.aws/config` (if using SSO)
 
-### Development Environment
-
-The application uses the following environment variables:
-- `NODE_ENV`: Set to 'development' during development and 'production' during packaging
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the LICENSE file for details

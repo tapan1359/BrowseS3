@@ -2,12 +2,11 @@ const AWS = require('aws-sdk');
 
 // Initialize AWS SDK
 const s3 = new AWS.S3({
-    region: 'us-east-1' // You'll need to configure this based on your needs
+    region: 'us-east-1', // You'll need to configure this based on your needs
 });
 
 // DOM Elements
 const bucketsContainer = document.getElementById('buckets');
-const fileList = document.getElementById('fileList');
 const refreshBtn = document.getElementById('refreshBtn');
 const uploadBtn = document.getElementById('uploadBtn');
 
@@ -27,7 +26,7 @@ async function listBuckets() {
 }
 
 function displayBuckets(buckets) {
-    bucketsContainer.innerHTML = buckets.map(bucket => `
+    bucketsContainer.innerHTML = buckets.map((bucket) => `
         <div class="bucket-item" onclick="selectBucket('${bucket.Name}')">
             ${bucket.Name}
         </div>
@@ -50,4 +49,4 @@ function showError(message) {
 }
 
 // Initialize the app
-listBuckets(); 
+listBuckets();

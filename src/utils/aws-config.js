@@ -8,4 +8,4 @@ export const getAvailableProfiles = async () => {
   // For now, return a default profile
   // In a real app, you would read this from ~/.aws/credentials
   return ['default'];
-}; 
+};

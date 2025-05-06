@@ -7,11 +7,11 @@ module.exports = defineConfig({
   base: process.env.NODE_ENV === 'development' ? '/' : './',
   build: {
     outDir: '.vite/renderer',
-    emptyOutDir: true
+    emptyOutDir: true,
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src')
-    }
-  }
-}); 
+      '@': path.resolve(__dirname, 'src'),
+    },
+  },
+});
